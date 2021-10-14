@@ -1,17 +1,18 @@
 package org.bitbucket.ucchy.undine.bridge;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.UUID;
-
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.model.user.UserManager;
 import net.luckperms.api.node.matcher.NodeMatcher;
 import net.luckperms.api.node.types.InheritanceNode;
-
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.RegisteredServiceProvider;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.UUID;
 
 /**
  * LuckPermsへアクセスするためのブリッジクラス
@@ -23,10 +24,11 @@ public class LuckPermsBridge {
     /**
      * コンストラクタは使用不可
      */
-    private LuckPermsBridge() {
+    private LuckPermsBridge(LuckPerms luckPerms) {
+        this.luckperms = luckPerms;
     }
 
-    public static LuckPerms luckperms = null;
+    private final LuckPerms luckperms;
 
     /**
      * LuckPermsをロードする
@@ -36,10 +38,9 @@ public class LuckPermsBridge {
      */
     public static LuckPermsBridge load(Plugin plugin) {
         if (plugin == null) return null;
-        if (!(plugin instanceof LuckPerms)) {
-            return null;
-        }
-        return new LuckPermsBridge();
+        RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
+        if (provider == null) return null;
+        return new LuckPermsBridge(provider.getProvider());
     }
 
     /**
